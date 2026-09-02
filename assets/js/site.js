@@ -152,15 +152,15 @@
       el.style.transform = 'translateY(0)';
     });
     fades.forEach(function (el, i) {
-      el.style.transition = 'opacity .8s ease ' + (0.34 + i * 0.09) + 's';
+      el.style.transition = 'opacity .7s ease ' + (0.26 + i * 0.08) + 's';
       el.style.opacity = 1;
     });
     strokes.forEach(function (s, i) {
-      s.style.transition = 'stroke-dashoffset 1.05s cubic-bezier(.32,.72,.26,1) ' + (0.55 + i * 0.13) + 's';
+      s.style.transition = 'stroke-dashoffset 1s cubic-bezier(.32,.72,.26,1) ' + (0.4 + i * 0.12) + 's';
       s.style.strokeDashoffset = 0;
     });
     marks.forEach(function (m, i) {
-      m.style.transition = 'opacity .55s ease ' + (0.95 + Math.floor(i / 2) * 0.13) + 's';
+      m.style.transition = 'opacity .5s ease ' + (0.8 + Math.floor(i / 2) * 0.12) + 's';
       m.style.opacity = 1;
     });
   }
