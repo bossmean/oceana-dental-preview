@@ -164,12 +164,11 @@
       m.style.opacity = 1;
     });
   }
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(runIntro);
-    setTimeout(runIntro, 900);
-  } else {
-    window.addEventListener('load', runIntro);
-  }
+  /* Run on the next frame rather than waiting on webfonts: gating this on
+     document.fonts.ready held the headline back and pushed largest contentful
+     paint out by well over a second. */
+  requestAnimationFrame(function () { requestAnimationFrame(runIntro); });
+  setTimeout(runIntro, 1200);
 
   /* ---------- masked heading reveal, used on two headings only ---------- */
   var reveals = document.querySelectorAll('[data-reveal] .mask > span');
