@@ -223,7 +223,8 @@ hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
 .drawer details[open] summary::after{content:"\2212"}
 .drawer details .sub a{padding-left:16px;font-size:1rem;color:var(--body)}
 .drawer .btns{margin-top:26px;flex-direction:column;align-items:stretch}
-.drawer .btns .btn{width:100%}
+.drawer .btns .btn{display:inline-flex;width:100%;border-bottom:0;padding:1.1em 1.5em;
+  font-size:1.02rem;text-align:center}
 body.lock{overflow:hidden}
 
 /* ---------- sticky mobile action bar ---------- */

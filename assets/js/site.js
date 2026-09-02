@@ -43,22 +43,34 @@
   dds.forEach(function (d) {
     var btn = d.querySelector('button');
     var pan = d.querySelector('.dd-p');
-    var t;
+    var t, byHover = false;
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
-      var open = btn.getAttribute('aria-expanded') === 'true';
+      // If hover already opened it, a click should keep it open rather than
+      // snapping it shut under the pointer.
+      var open = btn.getAttribute('aria-expanded') === 'true' && !byHover;
       closeAll(d);
+      byHover = false;
       btn.setAttribute('aria-expanded', String(!open));
       pan.classList.toggle('open', !open);
     });
     d.addEventListener('mouseenter', function () {
       clearTimeout(t); closeAll(d);
+      byHover = true;
       btn.setAttribute('aria-expanded', 'true'); pan.classList.add('open');
     });
     d.addEventListener('mouseleave', function () {
       t = setTimeout(function () {
+        byHover = false;
         btn.setAttribute('aria-expanded', 'false'); pan.classList.remove('open');
       }, 140);
+    });
+    // keyboard: leaving the group closes it
+    d.addEventListener('focusout', function (e) {
+      if (!d.contains(e.relatedTarget)) {
+        byHover = false;
+        btn.setAttribute('aria-expanded', 'false'); pan.classList.remove('open');
+      }
     });
   });
   document.addEventListener('click', function () { closeAll(null); });
