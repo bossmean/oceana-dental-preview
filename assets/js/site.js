@@ -148,3 +148,159 @@
     [].forEach.call(rv, function (el) { el.classList.add('in'); });
   }
 })();
+
+/* ==========================================================================
+   V2: motion, parallax, symptom finder, technology tabs
+   ========================================================================== */
+(function () {
+  'use strict';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- auto apply reveal classes, so every page moves the same way ----
+     Done in JS on purpose: with JS off nothing is ever hidden. */
+  var AUTO_RV = '.sec-head, .prose, .pillar, .note, .band-q, .rev-feat, .rev-top, .loc, .faq, ' +
+                '.tshow, .fnd, .bk-alert, .done-c, aside > .card, aside > .sum';
+  var AUTO_RVS = '.grid, .docs, .pay, .steps, .svc-g, .revs, .intent-g, .stats, .fnd-opts, .tech';
+  [].forEach.call(document.querySelectorAll(AUTO_RV), function (el) {
+    if (!el.classList.contains('rv') && !el.classList.contains('rv-s')) el.classList.add('rv');
+  });
+  [].forEach.call(document.querySelectorAll(AUTO_RVS), function (el) {
+    if (!el.classList.contains('rv') && !el.classList.contains('rv-s')) el.classList.add('rv-s');
+  });
+
+  /* ---- reveal on scroll, including staggered groups ---- */
+  var targets = document.querySelectorAll('.rv, .rv-s');
+  if (targets.length) {
+    if (!('IntersectionObserver' in window) || reduce) {
+      [].forEach.call(targets, function (el) { el.classList.add('in'); });
+    } else {
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+      [].forEach.call(targets, function (el) { io.observe(el); });
+    }
+  }
+
+  /* ---- parallax: hero background and full bleed bands ---- */
+  if (!reduce) {
+    var layers = [];
+    var heroBg = document.querySelector('.hero');
+    if (heroBg) layers.push({ el: heroBg, speed: 0.16, prop: 'hero' });
+    [].forEach.call(document.querySelectorAll('.band'), function (b) {
+      layers.push({ el: b, speed: 0.13, prop: 'band' });
+    });
+
+    if (layers.length) {
+      var ticking = false;
+      var apply = function () {
+        var vh = window.innerHeight;
+        layers.forEach(function (l) {
+          var r = l.el.getBoundingClientRect();
+          if (r.bottom < -200 || r.top > vh + 200) return;
+          var mid = r.top + r.height / 2;
+          var off = (mid - vh / 2) * l.speed;
+          l.el.style.setProperty('--par', (-off).toFixed(1) + 'px');
+        });
+        ticking = false;
+      };
+      var onScroll = function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+      };
+      apply();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+      document.documentElement.classList.add('par-on');
+    }
+  }
+
+  /* ---- counters ---- */
+  var nums = document.querySelectorAll('[data-count]');
+  if (nums.length && 'IntersectionObserver' in window && !reduce) {
+    var nio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        nio.unobserve(e.target);
+        var el = e.target;
+        var end = parseFloat(el.getAttribute('data-count'));
+        var dec = (el.getAttribute('data-dec') === '1') ? 1 : 0;
+        var t0 = null, dur = 1150;
+        var step = function (t) {
+          if (!t0) t0 = t;
+          var p = Math.min((t - t0) / dur, 1);
+          var e2 = 1 - Math.pow(1 - p, 3);
+          el.textContent = (end * e2).toFixed(dec);
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.5 });
+    [].forEach.call(nums, function (n) { nio.observe(n); });
+  }
+
+  /* ---- symptom finder ---- */
+  var finder = document.getElementById('finder');
+  if (finder) {
+    var panel = document.getElementById('fnd-panel');
+    var idle = panel.innerHTML;
+    var btns = [].slice.call(finder.querySelectorAll('.fnd-b'));
+    var DATA = JSON.parse(document.getElementById('finder-data').textContent);
+
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var k = b.getAttribute('data-k');
+        var already = b.getAttribute('aria-pressed') === 'true';
+        btns.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+        if (already) { panel.innerHTML = idle; return; }
+        b.setAttribute('aria-pressed', 'true');
+        var d = DATA[k];
+        panel.innerHTML =
+          '<div class="fnd-body">' +
+          '<span class="k">' + d.k + '</span>' +
+          '<h3>' + d.h + '</h3>' +
+          '<p>' + d.p + '</p>' +
+          '<div class="why"><b>What we would do</b><p>' + d.w + '</p></div>' +
+          '<div class="fnd-acts">' +
+          '<a class="btn btn-p" href="' + d.href + '">' + d.cta + '</a>' +
+          '<a class="btn btn-ol" href="book.html">Book an appointment</a>' +
+          '</div></div>';
+      });
+    });
+  }
+
+  /* ---- technology tabs ---- */
+  var tlist = document.getElementById('tlist');
+  if (tlist) {
+    var tp = document.getElementById('tpanel');
+    var TECH = JSON.parse(document.getElementById('tech-data').textContent);
+    var tbtns = [].slice.call(tlist.querySelectorAll('button'));
+    var paint = function (k) {
+      var d = TECH[k];
+      tp.innerHTML =
+        '<div class="tpanel-img" style="background-image:url(' + d.img + ')"></div>' +
+        '<div class="tpanel-t"><b>' + d.b + '</b><p>' + d.p + '</p>' +
+        '<div class="why">' + d.w + '</div></div>';
+    };
+    tbtns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        tbtns.forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+        b.setAttribute('aria-selected', 'true');
+        paint(b.getAttribute('data-k'));
+      });
+      b.addEventListener('keydown', function (e) {
+        var i = tbtns.indexOf(b);
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+          e.preventDefault(); tbtns[(i + 1) % tbtns.length].focus(); tbtns[(i + 1) % tbtns.length].click();
+        }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          var j = (i - 1 + tbtns.length) % tbtns.length;
+          tbtns[j].focus(); tbtns[j].click();
+        }
+      });
+    });
+    paint(tbtns[0].getAttribute('data-k'));
+    tbtns[0].setAttribute('aria-selected', 'true');
+  }
+})();
