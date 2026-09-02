@@ -11,22 +11,6 @@
   'use strict';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- container guides ---------- */
-  (function guides() {
-    var host = document.getElementById('guides');
-    if (!host) return;
-    var draw = function () {
-      var probe = document.querySelector('.wrap');
-      if (!probe) return;
-      var r = probe.getBoundingClientRect();
-      var pad = parseFloat(getComputedStyle(probe).paddingLeft) || 0;
-      host.innerHTML = '<i style="left:' + Math.round(r.left + pad) + 'px"></i>' +
-                       '<i style="left:' + Math.round(r.right - pad) + 'px"></i>';
-    };
-    draw();
-    window.addEventListener('resize', draw, { passive: true });
-  })();
-
   /* ---------- header ---------- */
   var burger = document.getElementById('burger');
   var drawer = document.getElementById('drawer');
@@ -134,16 +118,6 @@
 
     var lines = [].slice.call(document.querySelectorAll('.hero .mask > span'));
     var fades = [].slice.call(document.querySelectorAll('.hero .fade'));
-    var strokes = [].slice.call(document.querySelectorAll('.hero .annot .ln'));
-    var marks = [].slice.call(document.querySelectorAll('.hero .annot .pt, .hero .cal'));
-
-    strokes.forEach(function (s) {
-      var len = 0;
-      try { len = s.getTotalLength(); } catch (e) { len = 400; }
-      s.style.strokeDasharray = len;
-      s.style.strokeDashoffset = len;
-    });
-    marks.forEach(function (m) { m.style.opacity = 0; });
 
     root.removeAttribute('data-intro');
 
@@ -154,14 +128,6 @@
     fades.forEach(function (el, i) {
       el.style.transition = 'opacity .7s ease ' + (0.26 + i * 0.08) + 's';
       el.style.opacity = 1;
-    });
-    strokes.forEach(function (s, i) {
-      s.style.transition = 'stroke-dashoffset 1s cubic-bezier(.32,.72,.26,1) ' + (0.4 + i * 0.12) + 's';
-      s.style.strokeDashoffset = 0;
-    });
-    marks.forEach(function (m, i) {
-      m.style.transition = 'opacity .5s ease ' + (0.8 + Math.floor(i / 2) * 0.12) + 's';
-      m.style.opacity = 1;
     });
   }
   /* Run on the next frame rather than waiting on webfonts: gating this on
@@ -187,13 +153,13 @@
     [].forEach.call(document.querySelectorAll('[data-reveal]'), function (h) { io.observe(h); });
   }
 
-  /* ---------- symptom finder ---------- */
-  var finder = document.getElementById('finder');
-  if (finder) {
-    var panel = document.getElementById('fnd-panel');
+  /* ---------- problem picker, built from their Dental Problems page ---------- */
+  var pickData = document.getElementById('pick-data');
+  if (pickData) {
+    var panel = document.getElementById('pick-panel');
     var idle = panel.innerHTML;
-    var btns = [].slice.call(finder.querySelectorAll('.fnd-b'));
-    var DATA = JSON.parse(document.getElementById('finder-data').textContent);
+    var btns = [].slice.call(document.querySelectorAll('.pick-b'));
+    var DATA = JSON.parse(pickData.textContent);
     btns.forEach(function (b) {
       b.addEventListener('click', function () {
         var already = b.getAttribute('aria-pressed') === 'true';
@@ -202,11 +168,10 @@
         b.setAttribute('aria-pressed', 'true');
         var d = DATA[b.getAttribute('data-k')];
         panel.innerHTML =
-          '<div class="fnd-body"><span class="k">' + d.k + '</span><h3>' + d.h + '</h3>' +
-          '<p>' + d.p + '</p>' +
-          '<div class="why"><b>What we would do</b><p>' + d.w + '</p></div>' +
-          '<div class="fnd-acts"><a class="btn btn-d" href="' + d.href + '">' + d.cta + '</a>' +
-          '<a class="btn btn-c" href="book.html">Book an appointment</a></div></div>';
+          '<div class="pick-img"><img src="' + d.img + '" alt="" loading="lazy"></div>' +
+          '<div class="pick-t"><h3>' + d.h + '</h3><p>' + d.p + '</p>' +
+          '<div class="pick-acts"><a class="btn btn-s" href="' + d.href + '">' + d.cta + '</a>' +
+          '<a class="btn btn-b" href="book.html">Book an appointment</a></div></div>';
       });
     });
   }
