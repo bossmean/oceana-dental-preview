@@ -252,12 +252,12 @@ body.lock{overflow:hidden}
 @media(min-width:760px){.gens{grid-template-columns:repeat(3,1fr)}}
 .gen figure{margin:0}
 .gen .arch-s{aspect-ratio:4/4.6;box-shadow:var(--sh-s)}
-.gen h3{font-size:1.24rem;margin:1.1rem 0 .35rem}
-.gen p{font-size:.94rem;line-height:1.58;margin:0 0 .9rem}
-@media(min-width:760px){
-  .gens .gen:nth-child(2){margin-top:clamp(20px,3vw,46px)}
-  .gens .gen:nth-child(3){margin-top:clamp(40px,6vw,92px)}
-}
+.gen h3{font-size:1.24rem;margin:0 0 .35rem}
+.gen p{font-size:.94rem;line-height:1.58;margin:0 0 1.1rem}
+/* all three sit on the same baseline: images top aligned, links bottom aligned */
+.gen{display:flex;flex-direction:column}
+.gen figure{margin:0 0 1.1rem}
+.gen .lnk{align-self:flex-start;margin-top:auto}
 
 /* ==========================================================================
    PILLARS  (her three: wellness, comfort, whole family)
