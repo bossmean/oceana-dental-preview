@@ -275,8 +275,9 @@
         var n = document.createElement('div');
         n.className = 'note warn preview-note';
         n.style.textAlign = 'left';
-        n.innerHTML = '<b>Preview build.</b> This form is not connected to a mailbox yet, so ' +
-          'nothing was actually sent. Wire up the form endpoint in build.py before this page goes live.';
+        n.innerHTML = '<b>This is a preview.</b> The booking form is not connected to the ' +
+          'practice yet, so nothing was sent. To book a real appointment right now, please call ' +
+          '<a href="tel:+16136991626">(613) 699-1626</a>.';
         warn.appendChild(n);
       }
       done();
